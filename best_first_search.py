@@ -36,22 +36,17 @@ class TomorrowlandSearch:
         (t, u, covered, path) = state
         return set(covered) == self.genres and t <= self.festival_end
 
-    def heuristic(self, state, htype=1):
+    def heuristic(self, state):
         (t, u, covered, path) = state
         genres_left = len(self.genres - set(covered))
-        if htype == 2:
-            return genres_left + (t / self.festival_end)  # H2
-        elif htype == 3:
-            return genres_left * (1 + t / self.festival_end)  # H3
-        else:
-            return genres_left
+        return genres_left   # H2
 
 # -----------------------
 # Fixed Best-first search that builds tree with ONLY explored nodes
 # -----------------------
 def best_first_tree(problem, htype=2):
     start = (0, "entrance", frozenset(), [])  # Use frozenset instead of set
-    pq = [(problem.heuristic(start, htype), 0, start, None)]  # Added node_id and parent_id
+    pq = [(problem.heuristic(start), 0, start, None)]  # Added node_id and parent_id
     visited = set()
     expanded = 0
     trace = []
@@ -90,7 +85,7 @@ def best_first_tree(problem, htype=2):
 
         # expand successors - only add edges for nodes we actually explore
         for succ in problem.move_gen(state):
-            h = problem.heuristic(succ, htype)
+            h = problem.heuristic(succ)
             
             # Create new node for successor
             succ_node_id = node_counter
